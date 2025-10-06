@@ -23,22 +23,7 @@ jobs:
           python -m pip install -r requirements.txt
           python -m pip install -r requirements-dev.txt
 
-      - name: Ensure model cache dir exists
-        run: |
-          mkdir -p $HOME/.cache/llama_models
-          echo "Cache dir created: $HOME/.cache/llama_models"
-          ls -la $HOME/.cache || true
-
-      - name: Cache GGUF model
-        id: cache-model
-        uses: actions/cache@v4
-        with:
-          path: $HOME/.cache/llama_models
-          key: gguf-model-${{ runner.os }}-gemma-270m-v1
-          restore-keys: |
-            gguf-model-${{ runner.os }}-gemma-270m-
-
-      - name: Download GGUF model, if missing
+      - name: Pull GGUF model
         env:
           HF_HUB_TOKEN: ${{ secrets.HF_HUB_TOKEN }}
         run: |
@@ -71,7 +56,16 @@ jobs:
 
       - name: Build docker
         run: docker build -t rag-serve:ci .
-#
+
+      - name: Cache GGUF model
+        id: cache-model
+        uses: actions/cache@v4
+        with:
+          path: $HOME/.cache/llama_models
+          key: gguf-model-${{ runner.os }}-gemma-270m-v1
+          restore-keys: |
+            gguf-model-${{ runner.os }}-gemma-270m-
+
 #      - name: Download GGUF model artifact
 #        uses: actions/download-artifact@v4
 #        with:
