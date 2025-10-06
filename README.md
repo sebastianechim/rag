@@ -1,3 +1,3 @@
-# RAG Pipeline Example — GitHub Actions + GCP + FAISS + llama.cpp
+# LLM Pipeline Example — GitHub Actions + FAISS + llama.cpp
 
-This repository contains an example Retrieval-Augmented Generation (RAG) pipeline.
+This repository contains an example LLM pipeline.
