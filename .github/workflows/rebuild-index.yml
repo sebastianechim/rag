@@ -1,0 +1,34 @@
+name: Rebuild Index (artifact)
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 3 * * *'  # optional
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install deps
+        run: pip install -r requirements.txt
+
+      - name: Run rebuild locally (produce shards in /tmp/index_out)
+        run: |
+          # NOTE: this script expects numpy .npy files. For demo you can create small sample arrays.
+          python scripts/rebuild_index.py \
+            --sample-path ./tests/sample_vectors.npy \
+            --vectors-path ./tests/all_vectors.npy \
+            --ids-path ./tests/all_ids.npy \
+            --out-dir /tmp/index_out \
+            --gcs-bucket dummy-bucket  || true
+
+      - name: Upload shards & meta as artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: index-shards
+          path: /tmp/index_out
