@@ -15,5 +15,6 @@ emb = llm.create_embedding("Hello CI test")
 print("Embedding length:", len(emb['data'][0]['embedding']))
 
 # small generate
-resp = llm.create(prompt="Tell me the word 'CI test' in one sentence.", max_tokens=40, temperature=0.0)
-print("Generation:", resp.get("choices", [{}])[0].get("text","").strip())
+resp = llm.create_completion("Tell me the word 'CI test' in one sentence.", max_tokens=40, temperature=0.0)
+# the returned object has the text at resp["choices"][0]["text"]
+print("Generation:", resp.get("choices", [{}])[0].get("text", "").strip())

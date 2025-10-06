@@ -74,7 +74,7 @@ def query(q: Query, background_tasks: BackgroundTasks):
 
     User: {q.query}
     Answer:"""
-    resp = llm.create(prompt=prompt, max_tokens=256, temperature=0.2)
+    resp = llm.create_completion(prompt, max_tokens=256, temperature=0.2)
     answer = resp.get('choices', [{}])[0].get('text', '').strip()
     latency = (time.time() - t0) * 1000.0
     return {'answer': answer, 'retrieved': hits, 'latency_ms': latency}
