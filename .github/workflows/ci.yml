@@ -62,9 +62,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: $HOME/.cache/llama_models
-          key: gguf-model-${{ runner.os }}-gemma-270m-v1
+          key: gguf-model-${{ runner.os }}-gemma-270m
           restore-keys: |
-            gguf-model-${{ runner.os }}-gemma-270m-
+            gguf-model-${{ runner.os }}-gemma-270m
 
 #      - name: Download GGUF model artifact
 #        uses: actions/download-artifact@v4
