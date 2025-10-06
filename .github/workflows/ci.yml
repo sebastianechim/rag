@@ -47,16 +47,16 @@ jobs:
         id: cache-model
         uses: actions/cache@v4
         with:
-          path: $HOME/.cache/llama_models
-          key: gguf-model-${{ runner.os }}-gemma-270m
+          path: ~/.cache/llama_models
+          key: gguf-model-${{ runner.os }}-gemma-270m-v1
           restore-keys: |
-            gguf-model-${{ runner.os }}-gemma-270m
+            gguf-model-${{ runner.os }}-gemma-270m-
 
       - name: Lint
-        run: python -m flake8 src --max-line-length=100 || true
+        run: python -m flake8 src --max-line-length=100
 
       - name: Check formatting
-        run: python -m black --check src || true
+        run: python -m black --check src
 
       - name: Test
         run: |
