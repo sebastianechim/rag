@@ -1,6 +1,10 @@
 FROM python:3.10-slim
 WORKDIR /app
 COPY requirements.txt ./
+COPY scripts/download_model.py /app/scripts/download_model.py
+COPY docker-entrypoint.sh /app/docker-entrypoint.sh
+RUN chmod +x /app/docker-entrypoint.sh
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
 RUN apt-get update && apt-get install -y build-essential libgomp1 curl && rm -rf /var/lib/apt/lists/*
 RUN python -m pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
