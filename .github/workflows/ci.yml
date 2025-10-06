@@ -1,5 +1,4 @@
-# .github/workflows/ci.yml (excerpt / replace job's steps)
-name: CI
+name: CI (Build & Test)
 
 on:
   push:

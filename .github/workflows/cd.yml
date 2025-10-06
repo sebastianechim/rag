@@ -1,4 +1,4 @@
-name: CD (build & push only)
+name: CD (Build & Push)
 on:
   push:
     branches: [ main, pipelinewithoutgcp ]
