@@ -1,36 +1,74 @@
-name: CI
-on: [push, pull_request]
+# .github/workflows/ci.yml (excerpt / replace job's steps)
+name: CI (real GGUF smoke test)
+
+on:
+  push:
+    branches: [ main, pipelinewithoutgcp ]
+  pull_request:
+    branches: [ main, pipelinewithoutgcp ]
+
 jobs:
   build-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Setup Python
         uses: actions/setup-python@v4
-        with: { python-version: '3.10' }
+        with:
+          python-version: '3.10'
+
       - name: Install deps
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install pytest flake8 black
-      - name: Download GGUF (private/gated)
+          pip install requests
+
+      - name: Cache GGUF model
+        id: cache-model
+        uses: actions/cache@v4
+        with:
+          path: $HOME/.cache/llama_models
+          key: gguf-model-${{ runner.os }}-gemma-270m-v1
+          restore-keys: |
+            gguf-model-${{ runner.os }}-gemma-270m-
+
+      - name: Download GGUF model (if missing)
         env:
           HF_HUB_TOKEN: ${{ secrets.HF_HUB_TOKEN }}
         run: |
-          python - <<'PY'
-          import os, requests
-          url = "https://huggingface.co/unsloth/gemma-3-270m-it-GGUF/resolve/main/gemma-3-270m-it-UD-Q8_K_XL.gguf"
-          headers = {"Authorization": f"Bearer {os.environ['HF_HUB_TOKEN']}"}
-          r = requests.get(url, headers=headers, stream=True); r.raise_for_status()
-          with open("$HOME/.cache/llama_models/gemma-270m.gguf","wb") as f:
-              for chunk in r.iter_content(8192):
-                  f.write(chunk)
-          PY
+          mkdir -p $HOME/.cache/llama_models
+          MODEL_PATH="$HOME/.cache/llama_models/gemma-270m.gguf"
+          if [ -f "$MODEL_PATH" ]; then
+            echo "Model already cached at $MODEL_PATH"
+          else
+            echo "Model not present - downloading..."
+            python3 scripts/download_model.py \
+            --url "https://huggingface.co/unsloth/gemma-3-270m-it-GGUF/resolve/main/gemma-3-270m-it-UD-Q8_K_XL.gguf" \
+            --out "$HOME/.cache/llama_models/gemma-270m.gguf" \
+            --token "${HF_HUB_TOKEN}" || true
+          fi
+          echo "Listing model dir:"
+          ls -lh $HOME/.cache/llama_models || true
+          echo "File size (bytes):"
+          stat -c '%s %n' "$MODEL_PATH" || true
+
+      - name: Verify model exists
+        run: |
+          MODEL_PATH="$HOME/.cache/llama_models/gemma-270m.gguf"
+          if [ ! -f "$MODEL_PATH" ]; then
+            echo "ERROR: model is missing at $MODEL_PATH"
+            ls -la $HOME/.cache || true
+            exit 1
+          fi
+          echo "Model verified at $MODEL_PATH"
+
       - name: Lint
         run: flake8 src --max-line-length=100 || true
-      - name: CI smoke test
-        run: |
-         python tests/ci_smoke_test.py --model "$HOME/.cache/llama_models/gemma-270m.gguf"
+
+      - name: Run CI smoke test
+        run: python tests/ci_smoke_test.py --model "$HOME/.cache/llama_models/gemma-270m.gguf"
+
       - name: Tests
         run: pytest -q || true
       - name: Build docker
