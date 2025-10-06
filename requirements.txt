@@ -1,0 +1,11 @@
+llama-cpp-python>=0.2.0
+faiss-cpu>=1.7.4
+fastapi
+uvicorn[standard]
+numpy
+tqdm
+google-cloud-storage
+google-cloud-bigquery
+google-cloud-pubsub
+pydantic
+requests

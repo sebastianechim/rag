@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rag-serve
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: rag-serve
+    spec:
+      containers:
+      - name: rag-serve
+        image: ghcr.io/${GITHUB_REPOSITORY}/rag-serve:latest
+        env:
+        - name: INDEX_MANIFEST_GCS
+          value: gs://your-bucket/indexes/index_manifest.json
+        ports:
+        - containerPort: 8080
