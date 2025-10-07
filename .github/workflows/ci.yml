@@ -21,7 +21,7 @@ jobs:
         id: cache-dependencies
         uses: actions/cache@v4
         with:
-          path: $HOME/.cache/pip
+          path: ~/.cache/pip
           key: pip-${{ runner.os }}-requirements-all-v1
           restore-keys: |
             pip-${{ runner.os }}-requirements-all-
@@ -30,7 +30,7 @@ jobs:
         id: cache-model
         uses: actions/cache@v4
         with:
-          path: $HOME/.cache/llama_models
+          path: ~/.cache/llama_models
           key: model-${{ runner.os }}-gemma-270m-v1
           restore-keys: |
             model-${{ runner.os }}-gemma-270m-
