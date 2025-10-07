@@ -22,18 +22,18 @@ jobs:
         uses: actions/cache@v4
         with:
           path: $HOME/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          key: pip-${{ runner.os }}-requirements-all-v1
           restore-keys: |
-            ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt')-
+            pip-${{ runner.os }}-requirements-all-
 
       - name: Cache GGUF model
         id: cache-model
         uses: actions/cache@v4
         with:
           path: $HOME/.cache/llama_models
-          key: gguf-model-${{ runner.os }}-gemma-270m-v1
+          key: model-${{ runner.os }}-gemma-270m-v1
           restore-keys: |
-            gguf-model-${{ runner.os }}-gemma-270m-
+            model-${{ runner.os }}-gemma-270m-
 
       - name: Install dependencies
         run: |
